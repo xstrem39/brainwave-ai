@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../context/AuthContext';
 import { validateEmail, validatePassword } from '../utils/validators';
-import { FaBrain, FaEye, FaEyeSlash, FaSpinner, FaCheck } from 'react-icons/fa';
+import { FaBrain, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const roles = [
@@ -19,7 +19,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [success, setSuccess] = useState(false);
   const { register, isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -50,8 +49,8 @@ export default function RegisterPage() {
     try {
       const result = await register(form);
       if (result.success) {
-        setSuccess(true);
-        toast.success('Account created! Check your email to verify.');
+        toast.success('Account created successfully! Please log in.');
+        router.push('/login');
       } else {
         toast.error(result.error || 'Registration failed');
         if (result.error?.includes('email')) setErrors({ email: result.error });
@@ -62,21 +61,6 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
-
-  if (success) {
-    return (
-      <div className="min-h-screen bg-dark-900 grid-pattern flex items-center justify-center p-4">
-        <div className="card border border-emerald-500/20 max-w-md w-full text-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
-            <FaCheck className="text-emerald-400" size={28} />
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-3">Account Created!</h2>
-          <p className="text-slate-400 mb-6">We sent a verification link to <strong className="text-white">{form.email}</strong>. Please check your inbox and click the link to activate your account.</p>
-          <Link href="/login" className="btn-primary w-full justify-center">Go to Login</Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
