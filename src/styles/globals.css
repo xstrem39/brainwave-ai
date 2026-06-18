@@ -154,7 +154,7 @@ body {
   }
 
   .feature-card {
-    @apply card cursor-pointer group hover:scale-[1.02] hover:border-primary-500/40;
+   @apply card cursor-pointer hover:scale-[1.02];
   }
 
   .subscription-card {
