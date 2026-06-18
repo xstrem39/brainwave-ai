@@ -49,12 +49,9 @@ export default function LoginPage() {
         router.push(redirect || getDashboardByRole(result.user?.role));
       } else {
         toast.error(result.error || 'Login failed');
-        if (result.error?.includes('verify')) {
-          setErrors({ email: 'Please verify your email first' });
-        }
       }
     } catch (err) {
-      toast.error(err.message || 'Login failed');
+      toast.error(err.message || 'Login failed. Please check your internet connection.');
     } finally {
       setLoading(false);
     }
