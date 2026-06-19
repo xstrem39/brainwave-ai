@@ -1,12 +1,17 @@
 /** @type {import('next').NextConfig} */
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
+// GitHub Pages repository name
+const repoName = 'brainwave-ai';
 
 const nextConfig = {
   output: 'export',
   reactStrictMode: true,
-  basePath,
-  assetPrefix: basePath || undefined,
+
+  // Required for GitHub Pages
+  basePath: `/${repoName}`,
+  assetPrefix: `/${repoName}/`,
   trailingSlash: true,
+
   images: {
     unoptimized: true,
     domains: [
@@ -18,15 +23,26 @@ const nextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
   },
+
   env: {
-    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-    NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-    NEXT_PUBLIC_GOOGLE_SCRIPT_URL: process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL,
-    NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'BrainWave AI',
+    NEXT_PUBLIC_APP_URL:
+      process.env.NEXT_PUBLIC_APP_URL ||
+      'https://xstrem39.github.io/brainwave-ai/',
+    NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY:
+      process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '',
+    NEXT_PUBLIC_GOOGLE_SCRIPT_URL:
+      process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL || '',
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID:
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
   },
+
   webpack: (config) => {
-    config.resolve.fallback = { fs: false, net: false, tls: false };
+    config.resolve.fallback = {
+      fs: false,
+      net: false,
+      tls: false,
+    };
     return config;
   },
 };
