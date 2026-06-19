@@ -1,22 +1,5 @@
 import { validateEmail } from '../../../utils/validators';
-
-const backendCall = async (action, data) => {
-  const url = process.env.GOOGLE_SCRIPT_URL;
-  if (!url || url.includes('YOUR_DEPLOYED_SCRIPT_ID')) {
-    throw new Error('GOOGLE_SCRIPT_URL is not configured. Please add it in your Vercel environment variables.');
-  }
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, ...data }),
-  });
-  const text = await res.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new Error('Apps Script returned an invalid response. Make sure it is deployed as a Web App.');
-  }
-};
+import { backendCall } from '../../../utils/backend';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -44,7 +27,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const result = await backendCall('auth_register', {
+    const result = await backendCall('auth_register', null, {
       name: name.trim(),
       email: email.toLowerCase().trim(),
       password,

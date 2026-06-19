@@ -1,15 +1,5 @@
 import { rateLimit } from '../../../utils/security';
-
-const backendCall = async (action, data) => {
-  const url = process.env.GOOGLE_SCRIPT_URL;
-  if (!url) throw new Error('Backend not configured');
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, ...data }),
-  });
-  return res.json();
-};
+import { backendCall } from '../../../utils/backend';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
@@ -19,9 +9,9 @@ export default async function handler(req, res) {
   const { email } = req.body;
   if (!email) return res.status(400).json({ success: false, error: 'Email required' });
   try {
-    const result = await backendCall('auth_forgotPassword', { email });
+    const result = await backendCall('auth_forgotPassword', null, { email });
     return res.status(200).json(result);
-  } catch {
-    return res.status(500).json({ success: false, error: 'Request failed' });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message || 'Request failed' });
   }
 }

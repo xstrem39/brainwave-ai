@@ -1,15 +1,5 @@
 import { requireAuth, getTokenFromRequest } from '../../../utils/security';
-
-const backendCall = async (action, token, data = {}) => {
-  const url = process.env.GOOGLE_SCRIPT_URL;
-  if (!url) throw new Error('Backend not configured');
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, token, ...data }),
-  });
-  return res.json();
-};
+import { backendCall } from '../../../utils/backend';
 
 export default requireAuth(async function handler(req, res) {
   const token = getTokenFromRequest(req);
@@ -18,8 +8,8 @@ export default requireAuth(async function handler(req, res) {
     try {
       const result = await backendCall('notification_getAll', token);
       return res.status(200).json(result);
-    } catch {
-      return res.status(500).json({ success: false, error: 'Failed to fetch notifications' });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message || 'Failed to fetch notifications' });
     }
   }
 

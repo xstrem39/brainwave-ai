@@ -36,13 +36,13 @@ export default async function handler(req, res) {
 
   console.log('Paystack webhook:', event.event);
 
-  // Forward to Google Apps Script backend
   try {
     const url = process.env.GOOGLE_SCRIPT_URL;
     if (url) {
       await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'payment_webhook', ...event }),
       });
     }

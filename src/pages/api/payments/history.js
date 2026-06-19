@@ -1,15 +1,5 @@
 import { requireAuth, getTokenFromRequest } from '../../../utils/security';
-
-const backendCall = async (action, token) => {
-  const url = process.env.GOOGLE_SCRIPT_URL;
-  if (!url) throw new Error('Backend not configured');
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, token }),
-  });
-  return res.json();
-};
+import { backendCall } from '../../../utils/backend';
 
 export default requireAuth(async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'Method not allowed' });
@@ -18,6 +8,6 @@ export default requireAuth(async function handler(req, res) {
     const result = await backendCall('payment_getHistory', token);
     return res.status(200).json(result);
   } catch (err) {
-    return res.status(500).json({ success: false, error: 'Failed to fetch payment history' });
+    return res.status(500).json({ success: false, error: err.message || 'Failed to fetch payment history' });
   }
 });

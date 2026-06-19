@@ -154,7 +154,7 @@ body {
   }
 
   .feature-card {
-   @apply card cursor-pointer hover:scale-[1.02];
+    @apply card cursor-pointer hover:scale-[1.02];
   }
 
   .subscription-card {
