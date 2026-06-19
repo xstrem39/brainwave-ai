@@ -1,39 +1,39 @@
-import api from './api';
+import { callAppsScript, getToken } from '../utils/appsScript';
 
 export const userService = {
   async getProfile() {
-    return api.get('/user/profile');
+    return callAppsScript('user_getProfile', getToken());
   },
 
   async updateProfile(data) {
-    return api.put('/user/profile', data);
+    return callAppsScript('user_updateProfile', getToken(), data);
   },
 
   async updatePassword(oldPassword, newPassword) {
-    return api.put('/user/password', { oldPassword, newPassword });
+    return callAppsScript('user_updatePassword', getToken(), { oldPassword, newPassword });
   },
 
   async getStats() {
-    return api.get('/user/stats');
+    return callAppsScript('user_getStats', getToken());
   },
 
   async getActivity() {
-    return api.get('/user/activity');
+    return callAppsScript('user_getActivity', getToken());
   },
 
   async getCredits() {
-    return api.get('/user/credits');
+    return callAppsScript('credit_getBalance', getToken());
   },
 
   async getCreditHistory() {
-    return api.get('/user/credit-history');
+    return callAppsScript('credit_getHistory', getToken());
   },
 
   async getNotifications() {
-    return api.get('/notifications');
+    return callAppsScript('notification_getAll', getToken());
   },
 
   async markNotificationRead(id) {
-    return api.post('/notifications/read', { notificationId: id });
+    return callAppsScript('notification_markRead', getToken(), { notificationId: id });
   },
 };

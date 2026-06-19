@@ -1,56 +1,57 @@
-import api from './api';
-import Cookies from 'js-cookie';
-
-const COOKIE_OPTIONS = { expires: 7, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' };
+import { callAppsScript, getToken, setToken, removeToken, isLoggedIn } from '../utils/appsScript';
 
 export const authService = {
   async register(data) {
-    const result = await api.post('/auth/register', data);
-    return result;
+    return callAppsScript('auth_register', null, {
+      name: data.name?.trim(),
+      email: data.email?.toLowerCase().trim(),
+      password: data.password,
+      role: data.role || 'student',
+    });
   },
 
   async login(email, password) {
-    const result = await api.post('/auth/login', { email, password });
+    const result = await callAppsScript('auth_login', null, {
+      email: email.toLowerCase().trim(),
+      password,
+    });
     if (result.success && result.token) {
-      Cookies.set('brainwave_token', result.token, COOKIE_OPTIONS);
+      setToken(result.token);
     }
     return result;
   },
 
   async googleLogin(googleData) {
-    const result = await api.post('/auth/google', googleData);
+    const result = await callAppsScript('auth_googleAuth', null, { userData: googleData });
     if (result.success && result.token) {
-      Cookies.set('brainwave_token', result.token, COOKIE_OPTIONS);
+      setToken(result.token);
     }
     return result;
   },
 
   async logout() {
-    Cookies.remove('brainwave_token');
+    removeToken();
     return { success: true };
   },
 
   async getMe() {
-    return api.get('/auth/me');
+    const token = getToken();
+    if (!token) return { success: false, error: 'Not logged in' };
+    return callAppsScript('auth_me', token);
   },
 
   async verifyEmail(token) {
-    return api.post('/auth/verify-email', { token });
+    return callAppsScript('auth_verifyEmail', null, { token });
   },
 
   async forgotPassword(email) {
-    return api.post('/auth/forgot-password', { email });
+    return callAppsScript('auth_forgotPassword', null, { email });
   },
 
   async resetPassword(token, newPassword) {
-    return api.post('/auth/reset-password', { token, newPassword });
+    return callAppsScript('auth_resetPassword', null, { token, newPassword });
   },
 
-  getToken() {
-    return Cookies.get('brainwave_token');
-  },
-
-  isLoggedIn() {
-    return !!this.getToken();
-  },
+  getToken,
+  isLoggedIn,
 };
