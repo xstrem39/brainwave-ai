@@ -1,105 +1,46 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { authService } from '../services/auth.service';
-import { userService } from '../services/user.service';
+'use client';
 
-const AuthContext = createContext(null);
+import { createContext, useContext, useState } from 'react';
+
+const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [credits, setCredits] = useState(0);
-  const [subscription, setSubscription] = useState(null);
+  const [user] = useState({
+    id: 'guest_user',
+    name: 'Guest User',
+    email: 'guest@brainwave.ai',
+    role: 'student',
+    status: 'active',
+    subscription: 'free',
+    credits: 99999
+  });
 
-  const loadUser = useCallback(async () => {
-    if (!authService.isLoggedIn()) {
-      setLoading(false);
-      return;
-    }
-    try {
-      const result = await authService.getMe();
-      if (result.success) {
-        setUser(result.user);
-        setCredits(result.user.credits || 0);
-        setSubscription(result.user.subscription || null);
-      } else {
-        authService.logout();
-      }
-    } catch {
-      authService.logout();
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadUser();
-  }, [loadUser]);
-
-  const login = async (email, password) => {
-    const result = await authService.login(email, password);
-    if (result.success) {
-      setUser(result.user);
-      setCredits(result.user.credits || 0);
-      setSubscription(result.user.subscription || null);
-    }
-    return result;
+  const login = async () => {
+    return { success: true };
   };
 
-  const register = async (data) => {
-    return authService.register(data);
-  };
-
-  const googleLogin = async (googleData) => {
-    const result = await authService.googleLogin(googleData);
-    if (result.success) {
-      setUser(result.user);
-    }
-    return result;
+  const register = async () => {
+    return { success: true };
   };
 
   const logout = async () => {
-    await authService.logout();
-    setUser(null);
-    setCredits(0);
-    setSubscription(null);
-  };
-
-  const refreshCredits = async () => {
-    try {
-      const result = await userService.getCredits();
-      if (result.success) setCredits(result.credits);
-    } catch {}
-  };
-
-  const updateUser = (data) => {
-    setUser(prev => ({ ...prev, ...data }));
-  };
-
-  const hasRole = (roles) => {
-    if (!user) return false;
-    return Array.isArray(roles) ? roles.includes(user.role) : user.role === roles;
-  };
-
-  const isSubscribed = () => {
-    if (!subscription) return false;
-    return subscription.status === 'active' && new Date(subscription.endDate) > new Date();
+    return { success: true };
   };
 
   return (
-    <AuthContext.Provider value={{
-      user, loading, credits, subscription,
-      login, register, googleLogin, logout,
-      refreshCredits, updateUser, loadUser,
-      hasRole, isSubscribed,
-      isAuthenticated: !!user,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: true,
+        loading: false,
+        login,
+        register,
+        logout
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
-};
+export const useAuth = () => useContext(AuthContext);
